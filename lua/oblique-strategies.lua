@@ -229,7 +229,10 @@ end
 function M.setup(user_config)
   user_config = user_config or {}
   M.config = vim.tbl_deep_extend('keep', user_config, default_config)
-  if #M.config.keymaps > 0 then
+  if M.config.keymaps.show then
+    for k, v in pairs(M.config.keymaps.show) do
+      vim.keymap.set(k, v, M.show)
+    end
   end
 end
 
