@@ -157,7 +157,7 @@ local default_config = {
     anchor = 'NW',
     row = 0,
     col = 0,
-    width = 52,
+    width = 48,
     height = 8,
     focusable = false,
     border = 'single',
@@ -192,6 +192,8 @@ end
 local function draw_card()
   local options = M.config and M.config.win or default_config.win
   local buf = vim.api.nvim_create_buf(false, true)
+  options.col = (vim.api.nvim_list_uis()[1].width / 2) - (options.width / 2)
+  options.row = (vim.api.nvim_list_uis()[1].height / 2) - (options.height / 2)
   local id = vim.api.nvim_open_win(buf, false, options)
   vim.api.nvim_create_autocmd('CursorMoved', {
     desc = 'Close oblique strategy',
@@ -222,9 +224,25 @@ local function draw_card()
   return id
 end
 
+--- Set user configuration.
+---@param user_config The configuration table.
 function M.setup(user_config)
   user_config = user_config or {}
   M.config = vim.tbl_deep_extend('keep', user_config, default_config)
+  if #M.config.keymaps > 0 then
+  end
+end
+
+--- Draw an oblique strategy and display it in a floating window.
+---@return The window ID.
+function M.show()
+  return draw_card()
+end
+
+--- Get an oblique strategy as a string.
+---@return A string.
+function M.get()
+  return next_strategy()
 end
 
 return M
