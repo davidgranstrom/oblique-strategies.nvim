@@ -29,9 +29,7 @@ local strategies = {
   [[How would you have done it?]],
   [[Emphasize differences]],
   [[Do nothing for as long as possible]],
-  [[Bridges
-  -build
-  -burn]],
+  [[Bridges -build -burn]],
   [[Water]],
   [[You don't have to be ashamed of using your own ideas]],
   [[Tidy up]],
@@ -92,25 +90,17 @@ local strategies = {
   [[Remember those quiet evenings]],
   [[Take a break]],
   [[The tape is now the music]],
-  [[Short circuit
-  (example; a man eating peas with the idea that they will improve his virility shovels them straight into his lap)]],
+  [[Short circuit (example; a man eating peas with the idea that they will improve his virility shovels them straight into his lap)]],
   [[Use an old idea]],
-  [[Destroy
-  -nothing
-  -the most important thing]],
+  [[Destroy -nothing -the most important thing]],
   [[Change nothing and continue with immaculate consistency]],
   [[Imagine the music as a moving chain or caterpillar]],
-  [[Intentions
-  -credibility of
-  -nobility of
-  -humility of]],
+  [[Intentions -credibility of -nobility of -humility of]],
   [[Imagine the music as a set of disconnected events]],
   [[Imagine the piece as a set of disconnected events]],
   [[What are you really thinking about just now?]],
   [[Incorporate.]],
-  [[Children's voices
-  -speaking
-  -singing]],
+  [[Children's voices -speaking -singing]],
   [[Assemble some of the instruments in a group and treat the group]],
   [[Shut the door and listen from outside]],
   [[Is the tuning appropriate?]],
@@ -135,10 +125,7 @@ local strategies = {
   [[Do the washing up]],
   [[Convert a melodic element into a rhythmic element]],
   [[Spectrum analysis]],
-  [[Lowest common denominator check
-  -single beat
-  -single note
-  -single riff]],
+  [[Lowest common denominator check -single beat -single note -single riff]],
   [[Listen in total darkness, or in a very large room, very quietly]],
   [[Would anybody want it?]],
   [[Retrace your steps]],
@@ -147,7 +134,7 @@ local strategies = {
   [[Only a part, not the whole]],
   [[From nothing to more than nothing]],
   [[Be less critical more often]],
-  [[ ]],
+  [[ ]], -- blank card
 }
 
 local M = {}
@@ -157,21 +144,21 @@ local default_config = {
     anchor = 'NW',
     row = 0,
     col = 0,
-    width = 48,
-    height = 8,
+    width = 38,
+    height = 7,
     focusable = false,
     border = 'single',
     style = 'minimal',
   },
+  color = 'NormalFloat',
   keymaps = {},
 }
 
 local num_strategies = #strategies
 local current_index = 1
 
-math.randomseed(os.time())
-
 local function shuffle()
+  math.randomseed(os.time())
   for i = num_strategies, 1, -1  do
     local j = math.random(i)
     local tmp = strategies[i]
@@ -191,10 +178,13 @@ end
 
 local function draw_card()
   local options = M.config and M.config.win or default_config.win
+  local color = M.config and M.config.color or default_config.color
   local buf = vim.api.nvim_create_buf(false, true)
-  options.col = (vim.api.nvim_list_uis()[1].width / 2) - (options.width / 2)
-  options.row = (vim.api.nvim_list_uis()[1].height / 2) - (options.height / 2)
+  local ui = vim.api.nvim_list_uis()[1]
+  options.col = ui.width / 2 - options.width / 2
+  options.row = ui.height / 2 - options.height / 2
   local id = vim.api.nvim_open_win(buf, false, options)
+  vim.api.nvim_win_set_option(id, 'winhl', 'Normal:' .. color)
   vim.api.nvim_create_autocmd('CursorMoved', {
     desc = 'Close oblique strategy',
     once = true,
@@ -209,16 +199,21 @@ local function draw_card()
     end
   })
   local data = next_strategy()
-  data = vim.split(data, '\n')
-  vim.api.nvim_buf_set_lines(buf, 0, 0, true, data)
+  for i = 1, options.height do
+    vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
+  end
+  vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
+  vim.api.nvim_buf_set_lines(buf, 0, 0, true, {data})
   vim.api.nvim_win_call(id, function()
     vim.opt_local.wrap = true
-    vim.opt_local.textwidth = options.width / 2
+    vim.opt_local.textwidth = options.width - 4
     vim.cmd[[normal! gggwG]]
     vim.cmd(string.format('%%center %d', options.width))
   end)
-  local n = math.max(1, 3 - #data)
-  for i = 0, n do
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  lines = vim.tbl_filter(function(s) return #s > 0 end, lines)
+  local n = math.max(1, 4 - #lines)
+  for i = 1, n do
     vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
   end
   return id
