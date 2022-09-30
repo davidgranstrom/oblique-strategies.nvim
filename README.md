@@ -2,6 +2,8 @@
 
 [Oblique Strategies](https://en.wikipedia.org/wiki/Oblique_Strategies) is a card-based method for promoting creativity jointly created by musician/artist Brian Eno and multimedia artist Peter Schmidt, first published in 1975.
 
+![oblique-screenshot](https://user-images.githubusercontent.com/672917/193280372-00a220e9-cd8a-45e4-92f6-d62a9e0d5ac9.png)
+
 ## Installation
 
 Using packer.nvim
