@@ -202,7 +202,6 @@ local function draw_card()
   for i = 1, options.height do
     vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
   end
-  vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
   vim.api.nvim_buf_set_lines(buf, 0, 0, true, {data})
   vim.api.nvim_win_call(id, function()
     vim.opt_local.wrap = true
@@ -212,7 +211,13 @@ local function draw_card()
   end)
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
   lines = vim.tbl_filter(function(s) return #s > 0 end, lines)
-  local n = math.max(1, 4 - #lines)
+  local n = math.floor(options.height / 2)
+  if #lines == 2 or #lines == 3 then
+    n = n - 1
+  elseif #lines > 3 then
+    n = n - 2
+  end
+  n = math.max(1, n)
   for i = 1, n do
     vim.api.nvim_buf_set_lines(buf, 0, 0, true, {''})
   end
