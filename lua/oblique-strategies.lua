@@ -142,8 +142,6 @@ local default_config = {
   win = {
     relative = 'editor',
     anchor = 'NW',
-    row = 0,
-    col = 0,
     width = 38,
     height = 7,
     focusable = false,
@@ -181,8 +179,12 @@ local function draw_card()
   local color = M.config and M.config.color or default_config.color
   local buf = vim.api.nvim_create_buf(false, true)
   local ui = vim.api.nvim_list_uis()[1]
-  options.col = ui.width / 2 - options.width / 2
-  options.row = ui.height / 2 - options.height / 2
+  if not options.col then
+    options.col = ui.width / 2 - options.width / 2
+  end
+  if not options.row then
+    options.row = ui.height / 2 - options.height / 2
+  end
   local id = vim.api.nvim_open_win(buf, false, options)
   vim.api.nvim_win_set_option(id, 'winhl', 'Normal:' .. color)
   vim.api.nvim_create_autocmd('CursorMoved', {
@@ -236,7 +238,7 @@ function M.setup(user_config)
   end
 end
 
---- Draw an oblique strategy and display it in a floating window.
+--- Display an oblique strategy in a floating window.
 ---@return The window ID.
 function M.show()
   return draw_card()
